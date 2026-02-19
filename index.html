@@ -241,6 +241,15 @@
         .modal-clear { background: white; color: #ff4757; border: 2px solid #ff4757; padding: 10px 14px; border-radius: 9px; font-size: 13px; cursor: pointer; width: auto; margin-right: auto; }
         .modal-clear:hover { background: #ffebee; }
 
+        /* Edit word modal */
+        .edit-word-modal .modal-box { max-width: 500px; }
+        .modal-input { 
+            width: 100%; border: 2px solid #e8d5c0; border-radius: 10px; 
+            padding: 10px 12px; font-size: 14px; font-family: inherit; 
+            transition: border-color 0.2s; margin-bottom: 14px; 
+        }
+        .modal-input:focus { outline: none; border-color: #a0826d; }
+
         /* note display on card */
         .card-note { font-size: 12px; color: #a0826d; font-style: italic; margin-top: 8px; max-width: 280px; line-height: 1.5; text-align:center; }
         .card-note-ex { font-size: 12px; color: #888; margin-top: 4px; max-width: 280px; line-height: 1.5; text-align:center; }
@@ -530,60 +539,36 @@
             </div>
         </div>
     </div>
-<!-- Edit Word modal（新增） -->
-<div class="modal-overlay" id="edit-word-modal" onclick="closeEditWordModal(event)">
-  <div class="modal-box">
-    <div class="modal-word">🛠 編輯我的單字</div>
-    <div class="modal-label">德文</div>
-    <input id="edit-de" class="modal-textarea" style="height:auto" placeholder="德文單字">
-    <div class="modal-label">中文</div>
-    <input id="edit-zh" class="modal-textarea" style="height:auto" placeholder="中文意思">
-    <div class="modal-label">例句（選填）</div>
-    <textarea id="edit-sentence" class="modal-textarea" placeholder="例句…"></textarea>
-    <div class="modal-label">分類</div>
-    <select id="edit-category" class="modal-textarea" style="height:auto">
-      <option value="名詞">名詞 (Nomen)</option>
-      <option value="動詞">動詞 (Verb)</option>
-      <option value="形容詞">形容詞 (Adjektiv)</option>
-      <option value="副詞">副詞 (Adverb)</option>
-      <option value="介詞">介詞 (Präposition)</option>
-      <option value="片語">片語 (Phrase)</option>
-      <option value="其他">其他</option>
-    </select>
-    <div class="modal-btns">
-      <button class="modal-cancel" onclick="closeEditWordModal()">取消</button>
-      <button class="modal-save" onclick="saveEditedWord()">✅ 儲存</button>
-    </div>
-  </div>
 
-<!-- Edit Word modal（新增） -->
-<div class="modal-overlay" id="edit-word-modal" onclick="closeEditWordModal(event)">
-  <div class="modal-box">
-    <div class="modal-word">🛠 編輯我的單字</div>
-    <div class="modal-label">德文</div>
-    <input id="edit-de" class="modal-textarea" style="height:auto" placeholder="德文單字">
-    <div class="modal-label">中文</div>
-    <input id="edit-zh" class="modal-textarea" style="height:auto" placeholder="中文意思">
-    <div class="modal-label">例句（選填）</div>
-    <textarea id="edit-sentence" class="modal-textarea" placeholder="例句…"></textarea>
-    <div class="modal-label">分類</div>
-    <select id="edit-category" class="modal-textarea" style="height:auto">
-      <option value="名詞">名詞 (Nomen)</option>
-      <option value="動詞">動詞 (Verb)</option>
-      <option value="形容詞">形容詞 (Adjektiv)</option>
-      <option value="副詞">副詞 (Adverb)</option>
-      <option value="介詞">介詞 (Präposition)</option>
-      <option value="片語">片語 (Phrase)</option>
-      <option value="其他">其他</option>
-    </select>
-    <div class="modal-btns">
-      <button class="modal-cancel" onclick="closeEditWordModal()">取消</button>
-      <button class="modal-save" onclick="saveEditedWord()">✅ 儲存</button>
+    <!-- Edit word modal -->
+    <div class="modal-overlay edit-word-modal" id="edit-word-modal" onclick="closeEditWordModal(event)">
+        <div class="modal-box">
+            <div class="modal-word">編輯單字</div>
+            <div class="modal-zh" style="margin-bottom:20px;">修改德文、中文或例句</div>
+            <div class="modal-label">🇩🇪 德文單字</div>
+            <input type="text" class="modal-input" id="edit-german" placeholder="例如：Hallo">
+            <div class="modal-label">🇹🇼 中文意思</div>
+            <input type="text" class="modal-input" id="edit-chinese" placeholder="例如：你好">
+            <div class="modal-label">💬 例句（選填）</div>
+            <input type="text" class="modal-input" id="edit-sentence" placeholder="例如：Hallo, wie geht es dir?">
+            <div class="modal-label">📂 分類</div>
+            <select class="modal-input" id="edit-category" style="cursor:pointer;">
+                <option value="名詞">🏷️ 名詞</option>
+                <option value="動詞">⚡ 動詞</option>
+                <option value="形容詞">✨ 形容詞</option>
+                <option value="副詞">🔄 副詞</option>
+                <option value="介詞">🔗 介詞</option>
+                <option value="片語">💭 片語</option>
+                <option value="其他">📦 其他</option>
+            </select>
+            <div class="modal-btns">
+                <button class="modal-cancel" onclick="closeEditWordModal()">取消</button>
+                <button class="modal-save" onclick="saveEditedWord()">✅ 儲存</button>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
-<!-- FLASHCARD -->
+    <!-- FLASHCARD -->
     <div id="view-flash">
         <div class="flash-counter" id="flash-counter"></div>
         <div class="flash-progress"><div class="flash-progress-fill" id="fp-fill"></div></div>
@@ -1156,8 +1141,63 @@ function openNoteModalForWord(de, zh) {
     setTimeout(() => document.getElementById('modal-note').focus(), 200);
 }
 
+// ── Edit Word Modal ──
+let currentEditIndex = null;
+
+function openEditWordModal(index) {
+    currentEditIndex = index;
+    const word = cloudData.words[index];
+    document.getElementById('edit-german').value = word.german;
+    document.getElementById('edit-chinese').value = word.chinese;
+    document.getElementById('edit-sentence').value = word.sentence || '';
+    document.getElementById('edit-category').value = word.category || '名詞';
+    document.getElementById('edit-word-modal').classList.add('show');
+    setTimeout(() => document.getElementById('edit-german').focus(), 200);
+}
+
+function closeEditWordModal(e) {
+    if (e && e.target.id !== 'edit-word-modal') return;
+    document.getElementById('edit-word-modal').classList.remove('show');
+    currentEditIndex = null;
+}
+
+function saveEditedWord() {
+    if (currentEditIndex === null) return;
+    const german = document.getElementById('edit-german').value.trim();
+    const chinese = document.getElementById('edit-chinese').value.trim();
+    if (!german || !chinese) {
+        showToast('❌ 請填寫德文和中文！');
+        return;
+    }
+    
+    cloudData.words[currentEditIndex] = {
+        german,
+        chinese,
+        sentence: document.getElementById('edit-sentence').value.trim(),
+        category: document.getElementById('edit-category').value,
+        addedDate: cloudData.words[currentEditIndex].addedDate
+    };
+    
+    scheduleCloudSave();
+    renderWords();
+    updateFlashPool();
+    document.getElementById('edit-word-modal').classList.remove('show');
+    showToast('✅ 單字已更新並同步至雲端！');
+    currentEditIndex = null;
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        document.getElementById('edit-word-modal').classList.remove('show');
+    }
+});
+
 function startQuiz() {
     const pool = getActivePool();
+    if (!pool || pool.length === 0) {
+        showToast('❌ 沒有單字可以測驗！');
+        return;
+    }
     const use = pool.length >= 4 ? pool : [...B1_VOCAB];
     quizWords = [...use].sort(()=>Math.random()-0.5).slice(0,Math.min(15,use.length));
     quizIdx=0; quizSessionCorrect=0;
@@ -1167,7 +1207,15 @@ function startQuiz() {
 }
 
 function renderQuizQ() {
+    if (!quizWords || quizIdx >= quizWords.length) {
+        showToast('❌ 測驗資料錯誤');
+        return;
+    }
     const q = quizWords[quizIdx];
+    if (!q || !q.de || !q.zh) {
+        showToast('❌ 單字資料不完整');
+        return;
+    }
     document.getElementById('q-word').textContent = q.de;
     document.getElementById('q-score').textContent = `✅ ${quizSessionCorrect} / ${quizIdx}`;
     document.getElementById('q-prog').textContent = `第 ${quizIdx+1} / ${quizWords.length} 題`;
@@ -1291,115 +1339,16 @@ function renderWords() {
                 ${exVal   ? `<div class="word-note-ex">✍️ ${exVal}</div>` : ''}
                 <span class="category">${word.category||'其他'}</span>
             </div>
-          
-<div class="word-item-btns">
-  <button class="edit-btn" onclick="openNoteModalForWord(${JSON.stringify(word.german)}, ${JSON.stringify(word.chinese)})">✏️ 筆記</button>
-  <button class="edit-btn" onclick="openEditWordModal(${actualIndex})">🛠 編輯</button>
-  <button class="delete-btn" onclick="deleteWord(${actualIndex})">刪除</button>
-</div>
+            <div class="word-item-btns">
+                <button class="edit-btn" onclick="openEditWordModal(${actualIndex})">✏️ 編輯</button>
+                <button class="edit-btn" onclick="openNoteModalForWord(${JSON.stringify(word.german)}, ${JSON.stringify(word.chinese)})">📝 筆記</button>
+                <button class="delete-btn" onclick="deleteWord(${actualIndex})">刪除</button>
+            </div>
         </div>`;
     }).join('');
     document.getElementById('totalWords').textContent = cloudData.words.length;
 }
-// ====== 編輯我的單字（新增） ======
-let currentEditIndex = null;
 
-function openEditWordModal(index) {
-  currentEditIndex = index;
-  const w = cloudData.words[index];
-  if (!w) return;
-
-  // 預填內容
-  document.getElementById('edit-de').value = w.german || '';
-  document.getElementById('edit-zh').value = w.chinese || '';
-  document.getElementById('edit-sentence').value = w.sentence || '';
-  document.getElementById('edit-category').value = w.category || '其他';
-
-  document.getElementById('edit-word-modal').classList.add('show');
-  setTimeout(() => document.getElementById('edit-de').focus(), 150);
-}
-
-function closeEditWordModal(e) {
-  if (e && e.target !== document.getElementById('edit-word-modal')) return;
-  document.getElementById('edit-word-modal').classList.remove('show');
-  currentEditIndex = null;
-}
-
-function saveEditedWord() {
-  if (currentEditIndex === null) return;
-
-  // 取值與檢查
-  const newDe = document.getElementById('edit-de').value.trim();
-  const newZh = document.getElementById('edit-zh').value.trim();
-  const newSentence = document.getElementById('edit-sentence').value.trim();
-  const newCat = document.getElementById('edit-category').value;
-
-  if (!newDe || !newZh) {
-    showToast('請填寫德文與中文');
-    return;
-  }
-
-  const w = cloudData.words[currentEditIndex];
-  if (!w) return;
-
-  const oldDe = w.german;
-
-  // 寫回 words
-  w.german = newDe;
-  w.chinese = newZh;
-  w.sentence = newSentence;
-  w.category = newCat;
-
-  // 若德文字串有改，需同步處理「收藏、已複習、筆記鍵名」
-  if (oldDe !== newDe) {
-    renameMyWordSideEffects(oldDe, newDe);
-  }
-
-  scheduleCloudSave();
-  closeEditWordModal();
-  renderWords();
-  updateStats();
-  updateFlashPool();
-  // 若目前翻卡停在我的單字，重新渲染一下避免顯示舊字
-  try { renderFlash(); } catch (_) {}
-
-  showToast('✅ 已更新');
-}
-
-// 變更 key 相關的關聯（收藏、已複習、筆記）
-function renameMyWordSideEffects(oldDe, newDe) {
-  // 1) 收藏 favorites: 是一個字串陣列
-  const favSet = new Set(cloudData.favorites || []);
-  if (favSet.has(oldDe)) {
-    favSet.delete(oldDe);
-    favSet.add(newDe);
-    cloudData.favorites = [...favSet];
-  }
-
-  // 2) 已複習 learned: 也是字串陣列
-  const learnedSet = new Set(cloudData.learned || []);
-  if (learnedSet.has(oldDe)) {
-    learnedSet.delete(oldDe);
-    learnedSet.add(newDe);
-    cloudData.learned = [...learnedSet];
-  }
-
-  // 3) 筆記 notes: key 為 "note:<de>" 與 "ex:<de>"
-  if (!cloudData.notes) cloudData.notes = {};
-  const oldNoteKey = 'note:' + oldDe;
-  const oldExKey = 'ex:' + oldDe;
-  const newNoteKey = 'note:' + newDe;
-  const newExKey = 'ex:' + newDe;
-
-  if (cloudData.notes[oldNoteKey] && !cloudData.notes[newNoteKey]) {
-    cloudData.notes[newNoteKey] = cloudData.notes[oldNoteKey];
-  }
-  if (cloudData.notes[oldExKey] && !cloudData.notes[newExKey]) {
-    cloudData.notes[newExKey] = cloudData.notes[oldExKey];
-  }
-  delete cloudData.notes[oldNoteKey];
-  delete cloudData.notes[oldExKey];
-}
 // ═══════════════════════════════════════════════
 //  NOTIFICATION
 // ═══════════════════════════════════════════════
