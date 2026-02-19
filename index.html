@@ -4,7 +4,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>德文單字本 📚</title>
+    <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+      import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+        from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+      import { getFirestore, doc, getDoc, setDoc }
+        from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+      // Firebase 設定
+      const firebaseConfig = {
+        apiKey:            "AIzaSyDYNJUXegjiGRRITWc9esEZkvZ0N1djUzk",
+        authDomain:        "german-ac299.firebaseapp.com",
+        projectId:         "german-ac299",
+        storageBucket:     "german-ac299.firebasestorage.app",
+        messagingSenderId: "748368675760",
+        appId:             "1:748368675760:web:e95aa3d308f8a66044cc75"
+      };
+
+      const app  = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db   = getFirestore(app);
+
+      // 掛到 window 讓其他函式存取
+      window._auth     = auth;
+      window._db       = db;
+      window._provider = new GoogleAuthProvider();
+      window._doc      = doc;
+      window._getDoc   = getDoc;
+      window._setDoc   = setDoc;
+      window._signInWithPopup = signInWithPopup;
+      window._signOut  = signOut;
+
+      // 監聽登入狀態
+      onAuthStateChanged(auth, user => {
+        if (user) {
+          window._currentUser = user;
+          window.onUserSignedIn(user);
+        } else {
+          window._currentUser = null;
+          window.onUserSignedOut();
+        }
+      });
+    </script>
     <style>
+        /* ── Login Screen ── */
+        #login-screen {
+            position: fixed; inset: 0; z-index: 200;
+            background: linear-gradient(135deg, #c89f7e 0%, #8b7355 100%);
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .login-card {
+            background: white; border-radius: 24px; padding: 48px 40px;
+            text-align: center; box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+            max-width: 380px; width: 100%;
+        }
+        .login-icon { font-size: 56px; margin-bottom: 14px; }
+        .login-title { font-size: 22px; font-weight: 800; color: #8b6f47; margin-bottom: 8px; }
+        .login-sub { font-size: 14px; color: #999; margin-bottom: 32px; line-height: 1.6; }
+        .google-btn {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; padding: 14px 20px; border-radius: 10px;
+            background: white; color: #444; border: 2px solid #e0e0e0;
+            font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .google-btn:hover { border-color: #a0826d; background: #fff8f3; box-shadow: 0 4px 16px rgba(160,130,109,0.2); }
+        .google-logo { width: 20px; height: 20px; }
+        .login-note { font-size: 11px; color: #ccc; margin-top: 20px; line-height: 1.6; }
+
+        /* ── User bar ── */
+        .user-bar {
+            display: flex; align-items: center; gap: 10px;
+            background: #f5ebe0; border-radius: 10px; padding: 10px 14px;
+            margin-bottom: 16px;
+        }
+        .user-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            object-fit: cover; border: 2px solid #d4a574;
+        }
+        .user-avatar-placeholder {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: #d4a574; color: white; display: flex;
+            align-items: center; justify-content: center; font-size: 14px; font-weight: 700;
+        }
+        .user-name { font-size: 13px; font-weight: 600; color: #8b6f47; flex: 1; }
+        .user-email { font-size: 11px; color: #999; }
+        .signout-btn { width: auto; padding: 6px 14px; font-size: 12px; background: white; color: #a0826d; border: 1.5px solid #d4a574; border-radius: 8px; }
+        .signout-btn:hover { background: #f5ebe0; }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
@@ -336,12 +423,31 @@
 </head>
 <body>
 
+<!-- Login Screen -->
+<div id="login-screen">
+    <div class="login-card">
+        <div class="login-icon">📚</div>
+        <div class="login-title">德文單字本</div>
+        <div class="login-sub">登入後，你的單字、筆記、進度<br>會自動同步到所有裝置 ☁️</div>
+        <button class="google-btn" onclick="signInWithGoogle()">
+            <svg class="google-logo" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            用 Google 帳號登入
+        </button>
+        <div class="login-note">🔒 只存取你自己的單字資料，不會讀取其他 Google 內容</div>
+    </div>
+</div>
+
 <!-- Loading Screen -->
-<div id="loading-screen">
+<div id="loading-screen" style="display:none;">
     <div class="loading-card">
-        <div class="loading-icon">📚</div>
-        <div class="loading-title">正在載入單字本…</div>
-        <div class="loading-sub">讀取本機儲存資料</div>
+        <div class="loading-icon">☁️</div>
+        <div class="loading-title">正在同步資料…</div>
+        <div class="loading-sub">從雲端載入你的單字本</div>
         <div class="loading-bar"><div class="loading-fill"></div></div>
     </div>
 </div>
@@ -350,22 +456,20 @@
     <h1>📚 我的德文單字本</h1>
     <p class="subtitle">每天學一點，德文會更好！B1 全主題收錄 ✨</p>
 
-    <!-- Sync status bar -->
-    <div class="sync-bar" id="sync-bar">
-        <div class="sync-dot"></div>
-        <span id="sync-text">資料已儲存在此瀏覽器 💾</span>
-        <div style="margin-left:auto;font-size:12px;color:#999;">換裝置請使用備份匯出</div>
+    <!-- User bar -->
+    <div class="user-bar" id="user-bar">
+        <div id="user-avatar-wrap"></div>
+        <div>
+            <div class="user-name" id="user-name"></div>
+            <div class="user-email" id="user-email"></div>
+        </div>
+        <div class="sync-bar" id="sync-bar" style="margin:0;padding:6px 10px;flex:1;justify-content:flex-end;">
+            <div class="sync-dot"></div>
+            <span id="sync-text" style="font-size:12px;">已同步</span>
+        </div>
+        <button class="signout-btn" onclick="doSignOut()">登出</button>
     </div>
 
-    <!-- Backup bar -->
-    <div class="backup-section">
-        <h4>💾 跨裝置備份（換電腦時使用）</h4>
-        <div class="backup-btns">
-            <button class="backup-btn export" onclick="exportBackup()">⬇️ 匯出備份 JSON</button>
-            <button class="backup-btn import" onclick="document.getElementById('importFile').click()">⬆️ 匯入備份</button>
-            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)">
-        </div>
-    </div>
     <div class="stats-row">
         <div class="stat-box"><div class="stat-num" id="s-total">0</div><div class="stat-label">總單字</div></div>
         <div class="stat-box"><div class="stat-num" id="s-learned">0</div><div class="stat-label">已複習</div></div>
@@ -665,95 +769,122 @@ const B1_VOCAB = [
 ];
 
 // ═══════════════════════════════════════════════
-//  LOCAL STORAGE — 儲存在瀏覽器本機
-//  換裝置請使用「匯出備份 JSON」功能
+//  FIREBASE STORAGE — 雲端同步，跨裝置即時同步
 // ═══════════════════════════════════════════════
 
-const LS_KEY = 'b1-vocab-data';
-
-// 記憶體中的資料（從 localStorage 載入）
 let cloudData = {
-    words: [],
-    favorites: [],
-    learned: [],
-    notes: {},
-    quizCorrect: 0,
-    quizTotal: 0,
-    lastVisit: '',
-    notificationEnabled: false,
+    words: [], favorites: [], learned: [], notes: {},
+    quizCorrect: 0, quizTotal: 0, lastVisit: '', notificationEnabled: false,
 };
-
 let syncTimeout = null;
+let currentUid = null;
 
+// 從 Firestore 載入使用者資料
 async function loadFromCloud() {
+    if (!currentUid) return;
     try {
-        const raw = localStorage.getItem(LS_KEY);
-        if (raw) {
-            const parsed = JSON.parse(raw);
-            cloudData = { ...cloudData, ...parsed };
+        const ref = window._doc(window._db, 'users', currentUid);
+        const snap = await window._getDoc(ref);
+        if (snap.exists()) {
+            cloudData = { ...cloudData, ...snap.data() };
         }
     } catch (e) {
-        console.log('No local data yet, starting fresh.');
+        console.warn('Firestore load:', e.message);
+        setSyncStatus('error', '載入失敗，使用本機備份');
     }
 }
 
-// 防抖儲存
+// 防抖儲存（1.2 秒後寫入 Firestore）
 function scheduleCloudSave() {
-    setSyncStatus('syncing', '正在儲存…');
+    setSyncStatus('syncing', '同步中…');
     clearTimeout(syncTimeout);
-    syncTimeout = setTimeout(saveToCloud, 800);
+    syncTimeout = setTimeout(saveToCloud, 1200);
 }
 
 async function saveToCloud() {
+    if (!currentUid) return;
     try {
-        localStorage.setItem(LS_KEY, JSON.stringify(cloudData));
-        setSyncStatus('ok', '資料已儲存在此瀏覽器 💾');
+        const ref = window._doc(window._db, 'users', currentUid);
+        await window._setDoc(ref, cloudData);
+        setSyncStatus('ok', '✓ 已同步');
     } catch (e) {
-        setSyncStatus('error', '儲存失敗（瀏覽器空間不足？）');
-        console.error('localStorage save failed:', e);
+        setSyncStatus('error', '同步失敗');
+        console.error('Firestore save:', e);
     }
 }
 
 function setSyncStatus(type, msg) {
     const bar = document.getElementById('sync-bar');
+    if (!bar) return;
     bar.className = 'sync-bar' + (type !== 'ok' ? ' ' + type : '');
-    document.getElementById('sync-text').textContent = msg;
+    const el = document.getElementById('sync-text');
+    if (el) el.textContent = msg;
 }
 
-// ── 備份匯出 ──
+// ── Google 登入 / 登出 ──
+async function signInWithGoogle() {
+    try {
+        await window._signInWithPopup(window._auth, window._provider);
+        // onAuthStateChanged 會自動觸發 onUserSignedIn
+    } catch (e) {
+        alert('登入失敗：' + (e.message || e));
+    }
+}
+
+async function doSignOut() {
+    if (!confirm('確定要登出嗎？')) return;
+    await window._signOut(window._auth);
+}
+
+// 登入成功 callback（由 Firebase onAuthStateChanged 呼叫）
+window.onUserSignedIn = async function(user) {
+    currentUid = user.uid;
+
+    // 顯示載入畫面
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('loading-screen').style.display = 'flex';
+    document.getElementById('loading-screen').style.alignItems = 'center';
+    document.getElementById('loading-screen').style.justifyContent = 'center';
+    document.getElementById('loading-screen').style.position = 'fixed';
+    document.getElementById('loading-screen').style.inset = '0';
+    document.getElementById('loading-screen').style.background = 'linear-gradient(135deg,#c89f7e,#8b7355)';
+
+    await loadFromCloud();
+
+    // 顯示主畫面
+    document.getElementById('loading-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'block';
+
+    // 顯示使用者資訊
+    document.getElementById('user-name').textContent = user.displayName || '學習者';
+    document.getElementById('user-email').textContent = user.email || '';
+    const avatarWrap = document.getElementById('user-avatar-wrap');
+    if (user.photoURL) {
+        avatarWrap.innerHTML = `<img class="user-avatar" src="${user.photoURL}" referrerpolicy="no-referrer">`;
+    } else {
+        const initial = (user.displayName || 'U')[0].toUpperCase();
+        avatarWrap.innerHTML = `<div class="user-avatar-placeholder">${initial}</div>`;
+    }
+
+    setSyncStatus('ok', '✓ 已同步');
+    updateFlashPool(); updateStats(); renderFlash();
+    checkDailyReminder(); updateNotificationButton();
+};
+
+window.onUserSignedOut = function() {
+    currentUid = null;
+    document.getElementById('main-app').style.display = 'none';
+    document.getElementById('loading-screen').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+};
+
+// ── 備份匯出（保留功能） ──
 function exportBackup() {
-    const filename = `德文單字本備份_${new Date().toISOString().split('T')[0]}.json`;
-    const blob = new Blob([JSON.stringify(cloudData, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    showToast('✅ 備份已下載！存到 OneDrive 或隨身碟');
-}
-
-// ── 備份匯入 ──
-function importBackup(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const parsed = JSON.parse(e.target.result);
-            if (!parsed.words && !parsed.favorites) throw new Error('格式不符');
-            if (!confirm(`確定要匯入備份嗎？\n（目前資料將被覆蓋，共 ${(parsed.words||[]).length} 個自訂單字）`)) return;
-            cloudData = { ...cloudData, ...parsed };
-            localStorage.setItem(LS_KEY, JSON.stringify(cloudData));
-            updateFlashPool(); updateStats(); renderFlash();
-            showToast('✅ 備份匯入成功！');
-        } catch {
-            showToast('❌ 檔案格式錯誤，請選擇正確的備份 JSON');
-        }
-    };
-    reader.readAsText(file);
-    event.target.value = ''; // reset input
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(cloudData, null, 2)], {type:'application/json'}));
+    a.download = `德文單字本備份_${new Date().toISOString().split('T')[0]}.json`;
+    a.style.display='none'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    showToast('✅ 備份已下載！');
 }
 
 // ═══════════════════════════════════════════════
@@ -771,22 +902,9 @@ let currentFilter = '全部';
 let quizWords = [], quizIdx = 0, quizSessionCorrect = 0, quizAnswered = false;
 
 // ═══════════════════════════════════════════════
-//  INIT
+//  INIT — 由 Firebase onAuthStateChanged 觸發
+//  不需要手動 init()，登入後自動執行 onUserSignedIn
 // ═══════════════════════════════════════════════
-async function init() {
-    await loadFromCloud();
-
-    // Hide loading, show app
-    document.getElementById('loading-screen').style.display = 'none';
-    document.getElementById('main-app').style.display = 'block';
-
-    updateFlashPool();
-    updateStats();
-    renderFlash();
-    checkDailyReminder();
-    updateNotificationButton();
-    setSyncStatus('ok', '資料已儲存在此瀏覽器 💾');
-}
 
 function getActivePool() {
     const myMapped = cloudData.words.map(w => ({
@@ -1230,8 +1348,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('sentenceInput').addEventListener('keypress',e=>{ if(e.key==='Enter'){ addWord(); document.getElementById('germanInput').focus(); }});
 });
 
-// 啟動
-init();
+// Firebase onAuthStateChanged 自動觸發啟動，不需要手動 init()
 </script>
 </body>
 </html>
