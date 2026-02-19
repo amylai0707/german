@@ -555,8 +555,35 @@
       <button class="modal-save" onclick="saveEditedWord()">✅ 儲存</button>
     </div>
   </div>
+
+<!-- Edit Word modal（新增） -->
+<div class="modal-overlay" id="edit-word-modal" onclick="closeEditWordModal(event)">
+  <div class="modal-box">
+    <div class="modal-word">🛠 編輯我的單字</div>
+    <div class="modal-label">德文</div>
+    <input id="edit-de" class="modal-textarea" style="height:auto" placeholder="德文單字">
+    <div class="modal-label">中文</div>
+    <input id="edit-zh" class="modal-textarea" style="height:auto" placeholder="中文意思">
+    <div class="modal-label">例句（選填）</div>
+    <textarea id="edit-sentence" class="modal-textarea" placeholder="例句…"></textarea>
+    <div class="modal-label">分類</div>
+    <select id="edit-category" class="modal-textarea" style="height:auto">
+      <option value="名詞">名詞 (Nomen)</option>
+      <option value="動詞">動詞 (Verb)</option>
+      <option value="形容詞">形容詞 (Adjektiv)</option>
+      <option value="副詞">副詞 (Adverb)</option>
+      <option value="介詞">介詞 (Präposition)</option>
+      <option value="片語">片語 (Phrase)</option>
+      <option value="其他">其他</option>
+    </select>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeEditWordModal()">取消</button>
+      <button class="modal-save" onclick="saveEditedWord()">✅ 儲存</button>
+    </div>
+  </div>
 </div>
-    <!-- FLASHCARD -->
+
+<!-- FLASHCARD -->
     <div id="view-flash">
         <div class="flash-counter" id="flash-counter"></div>
         <div class="flash-progress"><div class="flash-progress-fill" id="fp-fill"></div></div>
